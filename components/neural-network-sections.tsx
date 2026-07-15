@@ -4,12 +4,12 @@ import { useEffect, useRef, useState } from "react"
 import { ArrowRight, BrainCircuit, Check, MapPin, Network, Terminal, Zap } from "lucide-react"
 import { experience, projects } from "@/lib/resume"
 
-function SectionIntro({ eyebrow, title, copy }: { eyebrow: string; title: string; copy: string }) {
+function SectionIntro({ eyebrow, title, copy }: { eyebrow: string; title?: string; copy?: string }) {
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-1.5">
       <p className="font-mono text-xs uppercase tracking-[0.22em] text-primary">{eyebrow}</p>
-      <h3 className="max-w-3xl text-balance text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">{title}</h3>
-      <p className="max-w-2xl text-pretty text-sm leading-relaxed text-muted-foreground">{copy}</p>
+      {title && <h3 className="max-w-3xl text-balance text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">{title}</h3>}
+      {copy && <p className="max-w-2xl text-pretty text-sm leading-relaxed text-muted-foreground">{copy}</p>}
     </div>
   )
 }
@@ -228,8 +228,6 @@ export function ExperienceNetwork() {
     <div className="training-shell flex flex-col gap-10 rounded-3xl border border-border bg-card p-5 backdrop-blur-md sm:p-8">
       <SectionIntro
         eyebrow="career_model.fit(history)"
-        title="Scroll the training run. Watch each role compile."
-        copy="The terminal narrates the real work from each position, then generates its checkpoint card. Every line is grounded in my CV."
       />
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(20rem,0.85fr)] lg:items-start">
         <div className="flex flex-col">
@@ -418,7 +416,7 @@ export function ProjectsNetwork() {
 
   return (
     <div className="network-shell flex flex-col gap-8 rounded-3xl border border-border bg-card p-5 backdrop-blur-md sm:p-8">
-      <SectionIntro eyebrow="network.forward(projects)" title="Pick a project. Fire its neural pathway." copy="Five different problems, five distinct routes. Choose an output to see data transform into a working system." />
+      <SectionIntro eyebrow="network.forward(projects)" />
 
       <div className="project-selector grid gap-3 sm:grid-cols-2 lg:grid-cols-5" aria-label="Choose a project">
         {projects.map((project, index) => {

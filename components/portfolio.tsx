@@ -233,8 +233,7 @@ export default function Portfolio() {
       <Education />
       <Contact />
       <footer className="border-t border-border py-8 text-center font-mono text-xs text-muted-foreground">
-        <span className="text-muted-foreground/60">{"// "}</span>
-        built by {profile.name} · Next.js + WebGL fluid sim
+        &copy; {new Date().getFullYear()} {profile.name}
       </footer>
     </main>
   )
