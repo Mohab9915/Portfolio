@@ -49,32 +49,30 @@
 
 :root {
   color-scheme: dark;
-  /* Warm near-black base — soft on the eyes, not pure #000 */
-  --background: oklch(0.16 0.008 60);
-  --foreground: oklch(0.9 0.015 75);
-  /* Translucent cards so the ember fluid glows through */
-  --card: oklch(0.2 0.012 60 / 62%);
-  --card-foreground: oklch(0.9 0.015 75);
-  --popover: oklch(0.18 0.012 60);
-  --popover-foreground: oklch(0.9 0.015 75);
-  /* Warm orange accent */
-  --primary: oklch(0.72 0.17 52);
-  --primary-foreground: oklch(0.16 0.01 60);
-  --secondary: oklch(0.26 0.02 55);
-  --secondary-foreground: oklch(0.9 0.015 75);
-  --muted: oklch(0.24 0.015 55);
-  --muted-foreground: oklch(0.68 0.03 65);
-  --accent: oklch(0.68 0.15 45);
-  --accent-foreground: oklch(0.16 0.01 60);
-  --destructive: oklch(0.6 0.2 25);
-  --border: oklch(0.7 0.06 60 / 16%);
-  --input: oklch(0.7 0.06 60 / 18%);
-  --ring: oklch(0.72 0.17 52);
-  --chart-1: oklch(0.72 0.17 52);
-  --chart-2: oklch(0.65 0.15 40);
-  --chart-3: oklch(0.78 0.13 70);
-  --chart-4: oklch(0.6 0.14 30);
-  --chart-5: oklch(0.82 0.1 80);
+  /* ML workspace palette: ink, graphite, parchment, muted steel, signal gold. */
+  --background: oklch(0.145 0.006 285);
+  --foreground: oklch(0.92 0.008 80);
+  --card: oklch(0.18 0.008 285 / 72%);
+  --card-foreground: oklch(0.92 0.008 80);
+  --popover: oklch(0.19 0.009 285);
+  --popover-foreground: oklch(0.92 0.008 80);
+  --primary: oklch(0.77 0.14 78);
+  --primary-foreground: oklch(0.145 0.006 285);
+  --secondary: oklch(0.245 0.01 285);
+  --secondary-foreground: oklch(0.92 0.008 80);
+  --muted: oklch(0.225 0.009 285);
+  --muted-foreground: oklch(0.67 0.018 285);
+  --accent: oklch(0.77 0.14 78);
+  --accent-foreground: oklch(0.145 0.006 285);
+  --destructive: oklch(0.62 0.18 28);
+  --border: oklch(0.72 0.02 285 / 15%);
+  --input: oklch(0.72 0.02 285 / 20%);
+  --ring: oklch(0.77 0.14 78);
+  --chart-1: oklch(0.77 0.14 78);
+  --chart-2: oklch(0.67 0.018 285);
+  --chart-3: oklch(0.83 0.025 80);
+  --chart-4: oklch(0.58 0.035 285);
+  --chart-5: oklch(0.92 0.008 80);
   --radius: 0.5rem;
   --sidebar: oklch(0.18 0.012 60);
   --sidebar-foreground: oklch(0.9 0.015 75);
@@ -135,12 +133,78 @@
   animation: rise-in 0.6s ease-out both;
 }
 
+/* ML network visual system */
+.neural-grid {
+  background-image:
+    linear-gradient(to right, color-mix(in oklch, var(--border) 55%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklch, var(--border) 55%, transparent) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: linear-gradient(to bottom, transparent, black 12%, black 88%, transparent);
+}
+
+.network-line {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+  transition: stroke 300ms ease, opacity 300ms ease;
+}
+.network-line.is-trained {
+  stroke: color-mix(in oklch, var(--primary) 38%, transparent);
+}
+.network-line.is-active {
+  stroke: var(--primary);
+  stroke-dasharray: 7 10;
+  animation: signal-flow 1.4s linear infinite;
+  filter: drop-shadow(0 0 5px color-mix(in oklch, var(--primary) 55%, transparent));
+}
+.signal-ring {
+  animation: neuron-pulse 1.8s ease-out infinite;
+}
+
+@keyframes signal-flow {
+  to { stroke-dashoffset: -34; }
+}
+@keyframes neuron-pulse {
+  0% { opacity: 0.85; transform: scale(0.9); }
+  70%, 100% { opacity: 0; transform: scale(1.45); }
+}
+
+@keyframes training-status {
+  0%, 100% { opacity: 0.45; box-shadow: 0 0 0 0 color-mix(in oklch, var(--primary) 45%, transparent); }
+  50% { opacity: 1; box-shadow: 0 0 0 5px transparent; }
+}
+
+@keyframes trial-enter {
+  from { opacity: 0; transform: translateX(10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.training-status {
+  animation: training-status 1.6s ease-in-out infinite;
+}
+
+.trial-result {
+  animation: trial-enter 320ms ease-out both;
+}
+
+.tuner-range {
+  cursor: ew-resize;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .caret {
     animation: none;
     opacity: 1;
   }
-  .rise-in {
+  .rise-in,
+  .network-line.is-active,
+  .signal-ring,
+  .training-status,
+  .trial-result {
     animation: none;
+  }
+  .signal-ring {
+    opacity: 0.55;
   }
 }
