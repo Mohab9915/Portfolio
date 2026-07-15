@@ -225,7 +225,7 @@ function Contact() {
 
 export default function Portfolio() {
   return (
-    <main className="relative mx-auto max-w-4xl px-6">
+    <main className="relative mx-auto max-w-6xl px-6">
       <Hero />
       <Experience />
       <Projects />
