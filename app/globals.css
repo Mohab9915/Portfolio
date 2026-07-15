@@ -133,78 +133,149 @@
   animation: rise-in 0.6s ease-out both;
 }
 
-/* ML network visual system */
+/* Scroll-driven training run and semantic neural graph */
+.epoch-card {
+  position: relative;
+  transition: background-color 300ms ease, box-shadow 300ms ease;
+}
+.epoch-card::before {
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  width: 2px;
+  content: "";
+  background: transparent;
+  transition: background-color 300ms ease;
+}
+.epoch-card.is-active {
+  background: color-mix(in oklch, var(--primary) 5%, transparent);
+  box-shadow: inset 0 0 48px color-mix(in oklch, var(--primary) 3%, transparent);
+}
+.epoch-card.is-active::before {
+  background: var(--primary);
+}
+.epoch-card:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -3px;
+}
+.epoch-index {
+  transition: border-color 250ms ease, color 250ms ease, box-shadow 250ms ease;
+}
+.epoch-card.is-active .epoch-index {
+  box-shadow: 0 0 0 5px color-mix(in oklch, var(--primary) 10%, transparent);
+}
+.training-progress {
+  transition: width 500ms ease;
+}
+.training-curve {
+  display: flex;
+  height: 6rem;
+  align-items: end;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--border);
+  padding-inline: 0.25rem;
+}
+.training-curve span {
+  flex: 1;
+  border-radius: 0.2rem 0.2rem 0 0;
+  background: var(--muted);
+  transition: background-color 300ms ease, height 500ms ease;
+}
+.training-curve span.is-complete {
+  background: color-mix(in oklch, var(--primary) 72%, var(--muted));
+}
+
 .neural-grid {
   background-image:
     linear-gradient(to right, color-mix(in oklch, var(--border) 55%, transparent) 1px, transparent 1px),
     linear-gradient(to bottom, color-mix(in oklch, var(--border) 55%, transparent) 1px, transparent 1px);
   background-size: 28px 28px;
-  mask-image: linear-gradient(to bottom, transparent, black 12%, black 88%, transparent);
+  scrollbar-color: var(--border) transparent;
 }
-
 .network-line {
   fill: none;
   stroke: var(--border);
-  stroke-width: 1.5;
+  stroke-width: 1.25;
   vector-effect: non-scaling-stroke;
-  transition: stroke 300ms ease, opacity 300ms ease;
+  transition: stroke 350ms ease, opacity 350ms ease;
 }
-.network-line.is-trained {
-  stroke: color-mix(in oklch, var(--primary) 38%, transparent);
+.network-line.is-faded {
+  opacity: 0.12;
 }
 .network-line.is-active {
   stroke: var(--primary);
+  stroke-width: 2.5;
   stroke-dasharray: 7 10;
-  animation: signal-flow 1.4s linear infinite;
-  filter: drop-shadow(0 0 5px color-mix(in oklch, var(--primary) 55%, transparent));
+  animation: signal-flow 1.25s linear infinite;
+  filter: drop-shadow(0 0 5px color-mix(in oklch, var(--primary) 60%, transparent));
 }
-.signal-ring {
-  animation: neuron-pulse 1.8s ease-out infinite;
+.network-neuron {
+  transition: opacity 350ms ease, filter 350ms ease;
+}
+.network-neuron.is-faded {
+  opacity: 0.28;
+}
+.network-neuron.is-active {
+  opacity: 1;
+  filter: drop-shadow(0 0 7px color-mix(in oklch, var(--primary) 60%, transparent));
+}
+.network-neuron.is-active .neuron-core {
+  border-color: var(--primary);
+  background: var(--primary);
+}
+.network-output {
+  transition: border-color 250ms ease, background-color 250ms ease, opacity 350ms ease, filter 350ms ease;
+}
+.network-output:hover,
+.network-output.is-active {
+  border-color: var(--primary);
+  background: color-mix(in oklch, var(--primary) 10%, var(--popover));
+}
+.project-detail {
+  animation: project-reveal 380ms ease-out both;
 }
 
 @keyframes signal-flow {
   to { stroke-dashoffset: -34; }
 }
-@keyframes neuron-pulse {
-  0% { opacity: 0.85; transform: scale(0.9); }
-  70%, 100% { opacity: 0; transform: scale(1.45); }
-}
-
 @keyframes training-status {
   0%, 100% { opacity: 0.45; box-shadow: 0 0 0 0 color-mix(in oklch, var(--primary) 45%, transparent); }
   50% { opacity: 1; box-shadow: 0 0 0 5px transparent; }
 }
-
-@keyframes trial-enter {
-  from { opacity: 0; transform: translateX(10px); }
-  to { opacity: 1; transform: translateX(0); }
+@keyframes project-reveal {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-
 .training-status {
   animation: training-status 1.6s ease-in-out infinite;
 }
 
-.trial-result {
-  animation: trial-enter 320ms ease-out both;
-}
-
-.tuner-range {
-  cursor: ew-resize;
+@media (max-width: 1023px) {
+  .training-telemetry {
+    position: static;
+    order: -1;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .caret {
-    animation: none;
-    opacity: 1;
-  }
+  .caret,
   .rise-in,
   .network-line.is-active,
-  .signal-ring,
   .training-status,
-  .trial-result {
+  .project-detail {
     animation: none;
   }
-  .signal-ring {
-    opacity: 0.55;
+  .epoch-card,
+  .epoch-card::before,
+  .epoch-index,
+  .training-progress,
+  .training-curve span,
+  .network-line,
+  .network-neuron,
+  .network-output {
+    transition: none;
+  }
+  .caret {
+    opacity: 1;
   }
 }
