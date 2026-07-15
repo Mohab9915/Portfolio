@@ -1,4 +1,4 @@
-import { ArrowUpRight, Cpu, GraduationCap, Mail, MapPin, Phone } from "lucide-react"
+import { GraduationCap, Mail, Phone } from "lucide-react"
 
 /* lucide v1 dropped brand marks, so we ship small inline brand SVGs. */
 function Github({ className }: { className?: string }) {
@@ -15,16 +15,9 @@ function Linkedin({ className }: { className?: string }) {
     </svg>
   )
 }
-import {
-  certifications,
-  education,
-  experience,
-  highlights,
-  profile,
-  projects,
-  skills,
-} from "@/lib/resume"
+import { certifications, education, highlights, profile, skills } from "@/lib/resume"
 import { TypedCode } from "@/components/typed-code"
+import { ExperienceNetwork, ProjectsNetwork } from "@/components/neural-network-sections"
 
 function SectionHeading({ index, title }: { index: string; title: string }) {
   return (
@@ -118,33 +111,7 @@ function Experience() {
   return (
     <section id="experience" className="py-20">
       <SectionHeading index="01." title="Experience" />
-      <div className="flex flex-col gap-5">
-        {experience.map((job) => (
-          <Panel key={job.company + job.period} className="p-6 sm:p-8">
-            <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <div>
-                <h3 className="text-lg font-semibold text-foreground">
-                  {job.role}{" "}
-                  <span className="text-primary">@ {job.company}</span>
-                </h3>
-                <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
-                  <MapPin className="size-3.5" />
-                  {job.location}
-                </p>
-              </div>
-              <span className="font-mono text-xs text-muted-foreground">{job.period}</span>
-            </div>
-            <ul className="mt-4 flex flex-col gap-2.5">
-              {job.points.map((point, i) => (
-                <li key={i} className="flex gap-3 text-sm leading-relaxed text-muted-foreground">
-                  <span className="mt-2 size-1.5 shrink-0 rounded-full bg-primary" />
-                  <span>{point}</span>
-                </li>
-              ))}
-            </ul>
-          </Panel>
-        ))}
-      </div>
+      <ExperienceNetwork />
     </section>
   )
 }
@@ -153,33 +120,7 @@ function Projects() {
   return (
     <section id="projects" className="py-20">
       <SectionHeading index="02." title="Projects" />
-      <div className="grid gap-5 sm:grid-cols-2">
-        {projects.map((project) => (
-          <Panel
-            key={project.name}
-            className="group flex flex-col p-6 transition-colors hover:border-primary"
-          >
-            <div className="flex items-start justify-between">
-              <Cpu className="size-6 text-primary" />
-              <ArrowUpRight className="size-5 text-muted-foreground transition-colors group-hover:text-primary" />
-            </div>
-            <h3 className="mt-4 text-lg font-semibold text-foreground">{project.name}</h3>
-            <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">
-              {project.description}
-            </p>
-            <ul className="mt-4 flex flex-wrap gap-2">
-              {project.stack.map((tech) => (
-                <li
-                  key={tech}
-                  className="rounded-full bg-secondary px-3 py-1 font-mono text-xs text-secondary-foreground"
-                >
-                  {tech}
-                </li>
-              ))}
-            </ul>
-          </Panel>
-        ))}
-      </div>
+      <ProjectsNetwork />
     </section>
   )
 }

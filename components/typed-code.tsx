@@ -15,42 +15,68 @@ const pun = "text-muted-foreground" // punctuation / brackets
 const com = "text-muted-foreground/70 italic" // comments
 
 const LINES: Tok[][] = [
-  [{ t: "// initializing developer profile", c: com }],
+  [{ t: "# serving an AI engineer profile", c: com }],
   [
-    { t: "const ", c: kw },
-    { t: "engineer", c: key },
+    { t: "from ", c: kw },
+    { t: "fastapi ", c: key },
+    { t: "import ", c: kw },
+    { t: "FastAPI", c: key },
+  ],
+  [
+    { t: "from ", c: kw },
+    { t: "pydantic ", c: key },
+    { t: "import ", c: kw },
+    { t: "BaseModel", c: key },
+  ],
+  [{ t: "", c: pun }],
+  [
+    { t: "app", c: key },
     { t: " = ", c: pun },
-    { t: "{", c: pun },
+    { t: "FastAPI", c: key },
+    { t: "(", c: pun },
+    { t: "title=", c: key },
+    { t: "\"Mohab AI\"", c: str },
+    { t: ")", c: pun },
   ],
   [
-    { t: "  name", c: key },
-    { t: ": ", c: pun },
-    { t: "'Mohab Haedarea'", c: str },
-    { t: ",", c: pun },
+    { t: "class ", c: kw },
+    { t: "Profile", c: key },
+    { t: "(", c: pun },
+    { t: "BaseModel", c: key },
+    { t: "):", c: pun },
   ],
   [
-    { t: "  role", c: key },
-    { t: ": ", c: pun },
-    { t: "'AI & Software Engineer'", c: str },
-    { t: ",", c: pun },
+    { t: "    role", c: key },
+    { t: ": str = ", c: pun },
+    { t: "\"AI Engineer\"", c: str },
   ],
   [
-    { t: "  focus", c: key },
-    { t: ": [", c: pun },
-    { t: "'LLM systems'", c: str },
+    { t: "    models", c: key },
+    { t: ": list[str] = [", c: pun },
+    { t: "\"RAG\"", c: str },
     { t: ", ", c: pun },
-    { t: "'RAG'", c: str },
-    { t: ", ", c: pun },
-    { t: "'voice agents'", c: str },
-    { t: "],", c: pun },
+    { t: "\"Voice AI\"", c: str },
+    { t: "]", c: pun },
+  ],
+  [{ t: "", c: pun }],
+  [
+    { t: "@app.get", c: kw },
+    { t: "(", c: pun },
+    { t: "\"/inference\"", c: str },
+    { t: ", response_model=", c: pun },
+    { t: "Profile", c: key },
+    { t: ")", c: pun },
   ],
   [
-    { t: "  status", c: key },
-    { t: ": ", c: pun },
-    { t: "'open to early-career roles'", c: str },
-    { t: ",", c: pun },
+    { t: "async def ", c: kw },
+    { t: "predict", c: key },
+    { t: "() -> Profile:", c: pun },
   ],
-  [{ t: "}", c: pun }],
+  [
+    { t: "    return ", c: kw },
+    { t: "Profile", c: key },
+    { t: "()", c: pun },
+  ],
 ]
 
 // Flatten to a single character stream so we can reveal char-by-char while
@@ -107,7 +133,7 @@ export function TypedCode() {
         <span className="size-3 rounded-full bg-destructive/80" />
         <span className="size-3 rounded-full bg-primary/80" />
         <span className="size-3 rounded-full bg-accent/60" />
-        <span className="ml-3 text-xs text-muted-foreground">profile.ts</span>
+        <span className="ml-3 text-xs text-muted-foreground">inference_api.py</span>
       </div>
 
       {/* code body */}
@@ -136,7 +162,7 @@ export function TypedCode() {
             <span className="mt-3 flex gap-4 text-muted-foreground/70">
               <span className="w-5 select-none text-right text-muted-foreground/40">$</span>
               <span>
-                node profile.ts <span className="caret bg-primary/80">&nbsp;</span>
+                uvicorn inference_api:app --reload <span className="caret bg-primary/80">&nbsp;</span>
               </span>
             </span>
           )}
