@@ -349,13 +349,21 @@
   transform: translateY(-2px);
 }
 .network-stage .network-line {
-  opacity: 0;
-  stroke: var(--primary);
-  stroke-width: 2;
-  stroke-dasharray: 6 8;
-  animation: network-edge-in 800ms ease forwards, signal-flow 1.25s linear infinite 800ms;
-  animation-delay: calc(var(--edge) * 150ms);
-  filter: drop-shadow(0 0 5px color-mix(in oklch, var(--primary) 58%, transparent));
+  fill: none !important;
+  stroke: rgba(255, 255, 255, 0.18) !important;
+  stroke-width: 1px !important;
+  opacity: 0.55 !important;
+  vector-effect: non-scaling-stroke !important;
+  animation: none !important;
+}
+.network-stage .network-line.is-active {
+  stroke: var(--primary) !important;
+  stroke-width: 2px !important;
+  stroke-dasharray: 7 10 !important;
+  opacity: 1 !important;
+  vector-effect: non-scaling-stroke !important;
+  animation: signal-flow 1.25s linear infinite !important;
+  filter: drop-shadow(0 0 5px color-mix(in oklch, var(--primary) 58%, transparent)) !important;
 }
 .network-node {
   position: absolute;
