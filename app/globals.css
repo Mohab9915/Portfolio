@@ -268,14 +268,136 @@
   .epoch-card,
   .epoch-card::before,
   .epoch-index,
-  .training-progress,
-  .training-curve span,
   .network-line,
-  .network-neuron,
-  .network-output {
+  .network-node,
+  .project-choice {
     transition: none;
   }
-  .caret {
+  .terminal-line,
+  .network-node {
     opacity: 1;
+    animation: none;
+  }
+  .caret { opacity: 1; }
+}
+
+/* Terminal-led experience */
+.training-terminal {
+  scrollbar-color: var(--border) transparent;
+}
+.terminal-body {
+  background-image: linear-gradient(color-mix(in oklch, var(--primary) 3%, transparent) 1px, transparent 1px);
+  background-size: 100% 1.75rem;
+}
+.terminal-line {
+  opacity: 0;
+  animation: terminal-line-in 360ms ease-out forwards;
+  animation-delay: calc(var(--line) * 110ms);
+}
+.epoch-generated {
+  opacity: 0.35;
+  transform: translateY(18px) scale(0.985);
+}
+.epoch-generated.is-generated {
+  opacity: 1;
+  transform: none;
+  transition: opacity 500ms ease, transform 500ms ease, background-color 300ms ease, box-shadow 300ms ease;
+}
+@keyframes terminal-line-in {
+  from { opacity: 0; transform: translateX(8px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* Project forward pass */
+.project-choice {
+  background: var(--popover);
+  transition: border-color 220ms ease, background-color 220ms ease, transform 220ms ease;
+}
+.project-choice:hover,
+.project-choice.is-active {
+  border-color: var(--primary);
+  background: color-mix(in oklch, var(--primary) 8%, var(--popover));
+  transform: translateY(-2px);
+}
+.network-stage .network-line {
+  opacity: 0;
+  stroke: var(--primary);
+  stroke-width: 2;
+  stroke-dasharray: 6 8;
+  animation: network-edge-in 800ms ease forwards, signal-flow 1.25s linear infinite 800ms;
+  animation-delay: calc(var(--edge) * 150ms);
+  filter: drop-shadow(0 0 5px color-mix(in oklch, var(--primary) 58%, transparent));
+}
+.network-node {
+  position: absolute;
+  width: 10rem;
+  min-height: 5.5rem;
+  translate: -50% -50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.35rem;
+  border: 1px solid color-mix(in oklch, var(--primary) 50%, var(--border));
+  border-radius: 0.75rem;
+  background: var(--popover);
+  padding: 0.85rem;
+  opacity: 0;
+  box-shadow: 0 0 24px color-mix(in oklch, var(--primary) 8%, transparent);
+  animation: network-node-in 500ms ease-out forwards;
+  animation-delay: calc(var(--node) * 190ms + 180ms);
+}
+.network-node span {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  line-height: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted-foreground);
+}
+.network-node strong {
+  font-size: 0.8rem;
+  line-height: 1.25rem;
+  color: var(--foreground);
+}
+.network-tool { width: 12rem; }
+.network-result {
+  width: 11rem;
+  border-width: 2px;
+  background: color-mix(in oklch, var(--primary) 10%, var(--popover));
+}
+.network-result strong { font-size: 1rem; }
+@keyframes network-edge-in {
+  from { opacity: 0; stroke-dashoffset: 40; }
+  to { opacity: 1; stroke-dashoffset: 0; }
+}
+@keyframes network-node-in {
+  from { opacity: 0; transform: scale(0.75); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@media (max-width: 1023px) {
+  .training-terminal { position: static; order: -1; }
+}
+@media (max-width: 639px) {
+  .network-route-mobile .network-node {
+    position: static;
+    width: 100%;
+    min-height: auto;
+    translate: none;
+    opacity: 1;
+    animation: network-node-in 450ms ease-out both;
+  }
+  .project-choice { min-height: 7rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .terminal-line,
+  .network-stage .network-line,
+  .network-node,
+  .epoch-generated,
+  .epoch-generated.is-generated {
+    opacity: 1;
+    transform: none;
+    animation: none;
+    transition: none;
   }
 }
