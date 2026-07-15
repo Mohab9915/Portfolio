@@ -24,13 +24,15 @@ import {
   projects,
   skills,
 } from "@/lib/resume"
+import { TypedCode } from "@/components/typed-code"
 
 function SectionHeading({ index, title }: { index: string; title: string }) {
   return (
     <div className="mb-10 flex items-baseline gap-4">
-      <span className="font-mono text-sm text-primary">{index}</span>
-      <h2 className="text-pretty text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-        {title}
+      <span className="font-mono text-sm text-muted-foreground/60">{index}</span>
+      <h2 className="text-pretty font-mono text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+        <span className="text-primary">{title}</span>
+        <span className="text-muted-foreground/60">()</span>
       </h2>
       <div className="h-px flex-1 bg-border" />
     </div>
@@ -51,46 +53,56 @@ function Panel({ children, className = "" }: { children: React.ReactNode; classN
 function Hero() {
   return (
     <section className="relative flex min-h-[92vh] flex-col justify-center py-24">
-      <p className="mb-4 font-mono text-sm text-primary">Hi, my name is</p>
-      <h1 className="text-balance text-5xl font-bold tracking-tight text-foreground sm:text-7xl">
-        {profile.name}
-      </h1>
-      <p className="mt-3 text-balance text-3xl font-semibold text-muted-foreground sm:text-5xl">
-        {profile.title}
-      </p>
-      <p className="mt-8 max-w-2xl text-pretty text-lg leading-relaxed text-muted-foreground">
-        {profile.tagline}
-      </p>
+      <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_1fr]">
+        {/* Left: intro copy */}
+        <div>
+          <p className="mb-5 font-mono text-sm text-primary">
+            <span className="text-muted-foreground/60">$</span> whoami
+          </p>
+          <h1 className="text-balance text-5xl font-bold tracking-tight text-foreground sm:text-6xl">
+            {profile.name}
+          </h1>
+          <p className="mt-3 font-mono text-xl font-medium text-primary sm:text-2xl">
+            {profile.title}
+          </p>
+          <p className="mt-6 max-w-xl text-pretty text-base leading-relaxed text-muted-foreground">
+            {profile.tagline}
+          </p>
 
-      <div className="mt-10 flex flex-wrap items-center gap-4">
-        <a
-          href={`mailto:${profile.email}`}
-          className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-transform hover:scale-[1.03]"
-        >
-          <Mail className="size-4" />
-          Get in touch
-        </a>
-        <a
-          href={profile.github}
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 text-sm font-medium text-foreground transition-colors hover:border-primary hover:text-primary"
-        >
-          <Github className="size-4" />
-          GitHub
-        </a>
-        <a
-          href={profile.linkedin}
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 text-sm font-medium text-foreground transition-colors hover:border-primary hover:text-primary"
-        >
-          <Linkedin className="size-4" />
-          LinkedIn
-        </a>
+          <div className="mt-9 flex flex-wrap items-center gap-3">
+            <a
+              href={`mailto:${profile.email}`}
+              className="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2.5 font-mono text-sm font-medium text-primary-foreground transition-transform hover:scale-[1.03]"
+            >
+              <Mail className="size-4" />
+              get_in_touch
+            </a>
+            <a
+              href={profile.github}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 rounded-md border border-border px-5 py-2.5 font-mono text-sm text-foreground transition-colors hover:border-primary hover:text-primary"
+            >
+              <Github className="size-4" />
+              GitHub
+            </a>
+            <a
+              href={profile.linkedin}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 rounded-md border border-border px-5 py-2.5 font-mono text-sm text-foreground transition-colors hover:border-primary hover:text-primary"
+            >
+              <Linkedin className="size-4" />
+              LinkedIn
+            </a>
+          </div>
+        </div>
+
+        {/* Right: typed code terminal */}
+        <TypedCode />
       </div>
 
-      <dl className="mt-16 grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <dl className="mt-20 grid grid-cols-2 gap-4 sm:grid-cols-4">
         {highlights.map((h) => (
           <Panel key={h.label} className="p-5">
             <dt className="font-mono text-3xl font-bold text-primary">{h.value}</dt>
@@ -242,7 +254,7 @@ function Education() {
 function Contact() {
   return (
     <section id="contact" className="py-24 text-center">
-      <p className="font-mono text-sm text-primary">05. What&apos;s next?</p>
+      <p className="font-mono text-sm text-muted-foreground/70">{"// what's next?"}</p>
       <h2 className="mt-4 text-balance text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
         Let&apos;s build something
       </h2>
@@ -252,10 +264,10 @@ function Contact() {
       </p>
       <a
         href={`mailto:${profile.email}`}
-        className="mt-10 inline-flex items-center gap-2 rounded-full bg-primary px-8 py-4 text-sm font-medium text-primary-foreground transition-transform hover:scale-[1.03]"
+        className="mt-10 inline-flex items-center gap-2 rounded-md bg-primary px-8 py-4 font-mono text-sm font-medium text-primary-foreground transition-transform hover:scale-[1.03]"
       >
         <Mail className="size-4" />
-        Say hello
+        say_hello()
       </a>
 
       <div className="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-muted-foreground">
@@ -280,7 +292,8 @@ export default function Portfolio() {
       <Education />
       <Contact />
       <footer className="border-t border-border py-8 text-center font-mono text-xs text-muted-foreground">
-        Designed &amp; built by {profile.name} · Interactive WebGL fluid background
+        <span className="text-muted-foreground/60">{"// "}</span>
+        built by {profile.name} · Next.js + WebGL fluid sim
       </footer>
     </main>
   )

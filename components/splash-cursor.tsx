@@ -999,17 +999,17 @@ export default function SplashCursor({
     }
 
     /**
-     * Generate a deep purple / magenta color. We bias the hue into the
-     * magenta-through-violet range and keep saturation high so the vapor
-     * always reads as glowing purple against the black backdrop.
+     * Generate a warm ember color. We bias the hue into the
+     * red-orange-through-amber range and keep the blue channel near zero so
+     * the vapor always reads as glowing orange against the black backdrop.
      */
     function generateColor(): ColorRGB {
-      // Hue range ~0.78 (violet) .. 0.92 (magenta)
-      const h = 0.78 + Math.random() * 0.14
+      // Hue range ~0.02 (red-orange) .. 0.11 (amber)
+      const h = 0.02 + Math.random() * 0.09
       const c = HSVtoRGB(h, 1.0, 1.0)
-      c.r *= 0.18
-      c.g *= 0.05
-      c.b *= 0.18
+      c.r *= 0.22
+      c.g *= 0.08
+      c.b *= 0.01
       return c
     }
 
