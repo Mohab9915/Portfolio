@@ -14,9 +14,25 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://www.mohab.website'),
   title: 'Mohab Haedarea — AI & Software Engineer',
   description:
     'Portfolio of Mohab Haedarea, an AI and software engineer specializing in LLM engineering, RAG pipelines, multi-agent orchestration, and full-stack development.',
+  openGraph: {
+    title: 'Mohab Haedarea — AI & Software Engineer',
+    description:
+      'Portfolio of Mohab Haedarea, an AI and software engineer specializing in LLM engineering, RAG pipelines, multi-agent orchestration, and full-stack development.',
+    url: 'https://www.mohab.website',
+    siteName: 'Mohab Haedarea Portfolio',
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Mohab Haedarea — AI & Software Engineer',
+    description:
+      'Portfolio of Mohab Haedarea, an AI and software engineer specializing in LLM engineering, RAG pipelines, multi-agent orchestration, and full-stack development.',
+  },
   icons: {
     icon: '/icon.svg',
     apple: '/icon.svg',
