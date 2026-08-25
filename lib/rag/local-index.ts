@@ -72,6 +72,24 @@ export function searchLocal(
   query: number[],
   limit: number,
 ): LocalHit[] {
+  // Refuse to compare vectors of different widths.
+  //
+  // `cosine` walks the query's length, so a wider query silently reads past
+  // the end of every stored vector and scores everything as noise — ranking
+  // then comes out arbitrary and the assistant answers confidently from the
+  // wrong passage. That is exactly what happens when the index was built with
+  // one embedding provider and the running app is configured for another
+  // (HF is 1024-d, OpenRouter 2048-d), which is easy to do by setting only
+  // some of the environment variables.
+  if (query.length !== index.dim) {
+    throw new Error(
+      `Embedding width mismatch: the query is ${query.length}-d but data/cv-index.json ` +
+        `was built at ${index.dim}-d with "${index.model}". The app is embedding with a ` +
+        'different provider than the index — check HF_API_KEY / HF_EMBED_MODEL, or re-run ' +
+        'pnpm rag:ingest to rebuild the index for the provider you want.',
+    )
+  }
+
   const rows = decodeVectors(index.vectors, index.dim)
 
   return index.chunks

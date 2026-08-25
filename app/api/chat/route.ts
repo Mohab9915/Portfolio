@@ -20,6 +20,7 @@ import { clientKey, rateLimit } from '@/lib/rag/ratelimit.ts'
 import { retrieve } from '@/lib/rag/retrieve.ts'
 import { rewriteQuery } from '@/lib/rag/rewrite.ts'
 import { listCollections } from '@/lib/rag/zilliz.ts'
+import cvIndex from '@/data/cv-index.json'
 
 // Needs Node: the local fallback index decodes vectors with Buffer.
 export const runtime = 'nodejs'
@@ -205,6 +206,12 @@ export async function GET() {
       rerank: cfg.rerankModel,
       chat: chatModel,
     },
+    // A bundled index built at a different width than the configured embedder
+    // makes every local-fallback answer nonsense, so say so plainly.
+    bundledIndex:
+      cvIndex.dim === embeddingDim(cfg)
+        ? `ok (${cvIndex.chunks.length} chunks, ${cvIndex.dim}-d, ${cvIndex.model})`
+        : `MISMATCH — index is ${cvIndex.dim}-d (${cvIndex.model}) but the app embeds at ${embeddingDim(cfg)}-d; re-run pnpm rag:ingest`,
     zilliz: zillizConfigured(cfg) ? 'configured' : 'not configured',
     collection: cfg.zilliz.collection,
   }
