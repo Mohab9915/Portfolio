@@ -279,7 +279,10 @@ export function RickPet({
       // rather than reverse-engineered from background-position.
       if (root.dataset.state !== brain.state) root.dataset.state = brain.state
       root.style.transform = `translate3d(${brain.x}px, 0, 0)`
-      sprite.style.transform = `scaleX(${brain.dir})`
+      // Rows whose art already faces left need the opposite flip, or he walks
+      // backwards. See SpriteState.facesLeft.
+      const facing = def.facesLeft ? -brain.dir : brain.dir
+      sprite.style.transform = `scaleX(${facing})`
       sprite.style.backgroundPosition = `-${brain.frame * size.w}px -${
         def.row * size.h
       }px`

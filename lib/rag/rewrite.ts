@@ -22,14 +22,27 @@ const REWRITE_HISTORY_TURNS = 4
 /** A rewrite longer than this means the model started explaining itself. */
 const MAX_REWRITE_CHARS = 300
 
-const SYSTEM = `You rewrite follow-up questions so they can be understood on their own.
+const SYSTEM = `You resolve references in follow-up questions. You are a substitution step, not a rewriter.
 
-You are given a conversation about Mohab Haedarea's CV, then his visitor's latest message. Rewrite that message as a single standalone question, replacing pronouns and references ("there", "that job", "he", "it") with what they actually refer to earlier in the conversation.
+You are given a conversation about Mohab Haedarea, then the visitor's latest message. Replace pronouns and back-references ("there", "that job", "it", "the company") with the specific thing they point at earlier in the conversation. Change NOTHING else.
 
 Rules:
-- Output ONLY the rewritten question. No preamble, no quotes, no explanation.
-- Keep it short and keep the original intent. Do not answer it.
-- If the message already stands on its own, output it unchanged.`
+- Output ONLY the resulting question. No preamble, no quotes, no explanation. Never answer it.
+- Substitute references. Do not elaborate, expand, clarify, or improve the question.
+- Never introduce a noun that was not already in the message or in what it refers to. Turning "what did he use" into "what tools or technologies did he use" is WRONG — those added words drag the search toward the wrong material.
+- Keep the visitor's own wording and length wherever it does not contain a reference.
+- But you MUST resolve every reference that is there. A dangling "there", "that", or "it" cannot survive into your output.
+- If nothing needs resolving, output the message EXACTLY as written, character for character.
+
+Examples:
+  "what does he do there?"  (after an answer about ASAL Technologies)
+    -> what does he do at ASAL Technologies?          [reference resolved]
+  "how long was that?"      (after an answer about the Fawri role)
+    -> how long was the Fawri role?                   [reference resolved]
+  "What did he use at his internship in Japan?"
+    -> What did he use at his internship in Japan?    [no reference: unchanged, NOT expanded]
+  "Is he any good with RAG?"
+    -> Is he any good with RAG?                       [no reference: unchanged]`
 
 export async function rewriteQuery(
   cfg: RagConfig,

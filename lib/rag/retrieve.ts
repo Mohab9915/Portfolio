@@ -109,7 +109,26 @@ export async function retrieve(
       RETRIEVE_K,
       signal,
     )
-    if (hits.length > 0) {
+    const best = hits.length > 0 ? Math.max(...hits.map((h) => h.score)) : 0
+
+    if (hits.length > 0 && best < MIN_RERANK_SCORE) {
+      /*
+       * The cross-encoder found nothing it considers relevant, and below that
+       * point its ordering is not just weak — it is measurably worse than the
+       * vector ordering it was given.
+       *
+       *   "tell me about his PhD"       vector #2 = An-Najah (his actual degree)
+       *                                 rerank    = drops it out of the top 5
+       *   "his internship in Japan"     vector #1 = Manipal, India (the real one)
+       *                                 rerank #1 = a different internship
+       *
+       * These are exactly the questions where the answer depends on surfacing
+       * the nearest true thing, so the bi-encoder's ordering is kept instead.
+       */
+      notes.push(
+        `All rerank scores below ${MIN_RERANK_SCORE} (best ${best.toFixed(4)}) — keeping vector order.`,
+      )
+    } else if (hits.length > 0) {
       reranked = true
       ordered = hits
         .map((h): Passage | null => {

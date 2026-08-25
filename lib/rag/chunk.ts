@@ -196,6 +196,14 @@ function educationChunks(lines: string[]): CvChunk[] {
     const period = entry.subRight
     const where = [location, period].filter(Boolean).join(', ')
 
+    // Without this the model reads "2021 – 2025" and hedges — it described a
+    // finished degree as one he is "working toward", which reads badly to a
+    // recruiter. Same "Present" test the roles use.
+    const ongoing = /present|current|expected|ongoing/i.test(period)
+    const standing = ongoing
+      ? 'STATUS: in progress — not yet completed.'
+      : 'STATUS: completed — he holds this qualification.'
+
     return {
       id: `education-${slug(school)}`,
       section: 'education',
@@ -203,7 +211,7 @@ function educationChunks(lines: string[]): CvChunk[] {
       meta: [degree, where].filter(Boolean).join(' · '),
       text: `${profile.name} — Education: ${degree} at ${school}${
         where ? ` (${where})` : ''
-      }.`,
+      }.\n${standing}`,
     }
   })
 }
