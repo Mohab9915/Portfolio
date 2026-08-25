@@ -31,9 +31,8 @@ export const experience: ExperienceItem[] = [
     role: "AI Software Engineer",
     period: "May 2026 – Present",
     points: [
-      "Built a modular Arabic (Palestinian/Jordanian dialect) Voice AI agent for car leasing using Pipecat, with custom pipeline components, type-safe configs, and real-time audio transport.",
-      "Engineered low-latency voice pipeline processors for smooth, responsive conversational flow.",
-      "Built a web portal and WhatsApp chatbot integration for lease inquiries, pricing, documents, and real-time sync.",
+      "Contributed to a modular Arabic (Palestinian/Jordanian dialect) voice AI agent built with Pipecat: engineered conversation state handling, enriched the agent's context, and improved its behaviour and the overall user experience.",
+      "Reduced end-to-end latency across the voice pipeline for smoother, more responsive conversational flow.",
       "Built a DSPy pipeline to migrate prompts from GPT-4 to Grok, Gemini, and Llama using Bayesian search (MIPROv2) and genetic mutation (GEPA) to prevent output regressions.",
     ],
   },

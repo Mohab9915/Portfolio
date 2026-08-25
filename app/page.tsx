@@ -1,3 +1,4 @@
+import AskRick from "@/components/pet/ask-rick"
 import Portfolio from "@/components/portfolio"
 import SplashCursor from "@/components/splash-cursor"
 
@@ -12,6 +13,8 @@ export default function Page() {
         className="pointer-events-none fixed inset-0 -z-[5] bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(6,2,12,0.75)_100%)]"
       />
       <Portfolio />
+      {/* Sprite mascot + CV-grounded RAG assistant */}
+      <AskRick />
     </>
   )
 }
