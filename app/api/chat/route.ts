@@ -192,9 +192,11 @@ export async function GET() {
   const chatModel =
     provider === 'groq'
       ? cfg.groq.model
-      : provider === 'gemini'
-        ? cfg.gemini.model
-        : cfg.chatModel
+      : provider === 'llm7'
+        ? cfg.llm7.model
+        : provider === 'gemini'
+          ? cfg.gemini.model
+          : cfg.chatModel
   const health: Record<string, unknown> = {
     // Embeddings and reranking always go through OpenRouter, whichever
     // backend ends up generating the answer.

@@ -57,6 +57,10 @@ export interface RagConfig {
     apiKey: string
     model: string
   }
+  llm7: {
+    apiKey: string
+    model: string
+  }
   gemini: {
     apiKey: string
     model: string
@@ -108,6 +112,11 @@ export function ragConfig(): RagConfig {
       // fastest backend measured. Swapping this is one line, but see the
       // think-filter note in groq.ts before picking a reasoning model.
       model: (process.env.GROQ_MODEL ?? 'openai/gpt-oss-120b').trim(),
+    },
+    llm7: {
+      apiKey: (process.env.LLM7_API_KEY ?? '').trim(),
+      // Verified working on a zero balance; other models there return 402.
+      model: (process.env.LLM7_MODEL ?? 'gemini-3.1-flash-lite').trim(),
     },
     gemini: {
       apiKey: (process.env.GEMINI_API_KEY ?? '').trim(),

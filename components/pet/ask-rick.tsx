@@ -38,6 +38,23 @@ const SUGGESTIONS = [
   'How do I reach him?',
 ]
 
+/**
+ * Wake the retrieval path on first sign of intent.
+ *
+ * Cold, the three retrieval hops take ~8.8s; warm, ~1.0s. Firing this when the
+ * visitor hovers the pet or opens the panel buys several seconds of runway
+ * while they read and type, so the first real question lands on a warm path.
+ * Fire-and-forget, once per page load.
+ */
+let warmed = false
+function warmPipeline() {
+  if (warmed) return
+  warmed = true
+  void fetch('/api/chat/warm', { method: 'POST' }).catch(() => {
+    // A failed warm-up is invisible; the real request reports its own errors.
+  })
+}
+
 /** Remembers the mute choice between visits. */
 const VOICE_PREF_KEY = 'ask-rick:voice'
 
@@ -148,7 +165,9 @@ export default function AskRick() {
   }, [messages, phase])
 
   useEffect(() => {
-    if (open) inputRef.current?.focus()
+    if (!open) return
+    inputRef.current?.focus()
+    warmPipeline()
   }, [open])
 
   useEffect(() => {
@@ -436,6 +455,7 @@ export default function AskRick() {
       <RickPet
         activity={petActivity}
         anchored={open}
+        onHoverIntent={warmPipeline}
         onSummon={(rect) => {
           setAnchor({ centerX: rect.left + rect.width / 2, top: rect.top })
           setOpen((v) => !v)

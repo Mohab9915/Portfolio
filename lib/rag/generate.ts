@@ -1,15 +1,20 @@
 /**
  * Picks the generation backend and degrades between them.
  *
- * Ordered fastest-first: Groq (~0.6 s to first token), then Gemini (~1.1 s),
- * then OpenRouter. Each is only tried if the one before it is unconfigured or
- * fails outright, so a throttled or overloaded provider costs a retry rather
- * than taking the assistant down — which is what happened during development
- * when a stealth model's shared pool started returning 429.
+ * Ordered fastest-first: Groq (~0.45 s to first token), LLM7 (~0.97 s),
+ * Gemini (~1.1 s), then OpenRouter. LLM7 sits second not for speed but because
+ * it draws on a separate quota from Groq, whose free tier runs out of tokens
+ * per minute long before a busy page runs out of visitors.
+ *
+ * Each is tried only if the one before it is unconfigured or fails outright, so
+ * a throttled provider costs a failover rather than taking the assistant down —
+ * which is what happened in development when a stealth model's shared pool
+ * started returning 429.
  */
 
 import { geminiConfigured, streamGemini } from './gemini.ts'
 import { groqConfigured, streamGroq } from './groq.ts'
+import { llm7Configured, streamLlm7 } from './llm7.ts'
 import { streamChat, type ChatMessage, type StreamEvent } from './openrouter.ts'
 import type { RagConfig } from './config.ts'
 
@@ -31,6 +36,7 @@ type Provider = {
 
 const PROVIDERS: Provider[] = [
   { name: 'groq', enabled: groqConfigured, stream: streamGroq },
+  { name: 'llm7', enabled: llm7Configured, stream: streamLlm7 },
   { name: 'gemini', enabled: geminiConfigured, stream: streamGemini },
   { name: 'openrouter', enabled: (cfg) => Boolean(cfg.apiKey), stream: streamChat },
 ]

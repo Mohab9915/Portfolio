@@ -109,9 +109,15 @@ export async function* streamGemini(
 
     const detail = await attempted.text().catch(() => '')
     lastError = `${attempted.status} ${detail.slice(0, 200)}`
-    // 503 is the "high demand" case and 429 is quota; both are worth another
-    // try. Anything else is our fault and will fail identically.
-    if (attempted.status !== 503 && attempted.status !== 429) break
+
+    // 429 is a quota window, not a blip — retrying inside a couple of seconds
+    // cannot clear it, so fall through to the next provider immediately. 503
+    // ("high demand") genuinely is transient and worth another try.
+    if (attempted.status === 429) {
+      lastError = '429 quota exceeded'
+      break
+    }
+    if (attempted.status !== 503) break
   }
 
   if (!res || !res.body) {

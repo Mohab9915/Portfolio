@@ -25,6 +25,8 @@ interface Props {
    * mid-conversation; now the panel comes to him and he never moves for it.
    */
   onSummon: (rect: DOMRect) => void
+  /** Fired when the visitor looks likely to chat, to warm the backend. */
+  onHoverIntent?: () => void
 }
 
 /** Pixels per second. */
@@ -64,7 +66,12 @@ interface Brain {
   ready: boolean
 }
 
-export function RickPet({ activity, anchored, onSummon }: Props) {
+export function RickPet({
+  activity,
+  anchored,
+  onSummon,
+  onHoverIntent,
+}: Props) {
   const rootRef = useRef<HTMLButtonElement>(null)
   const spriteRef = useRef<HTMLSpanElement>(null)
   const brainRef = useRef<Brain | null>(null)
@@ -292,6 +299,8 @@ export function RickPet({ activity, anchored, onSummon }: Props) {
       ref={rootRef}
       type="button"
       onClick={handleClick}
+      onPointerEnter={onHoverIntent}
+      onFocus={onHoverIntent}
       aria-label="Ask Rick about Mohab's experience"
       className="group fixed left-0 z-40 cursor-pointer select-none border-0 bg-transparent p-0 outline-none focus-visible:ring-2 focus-visible:ring-primary"
       style={{
