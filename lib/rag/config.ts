@@ -25,6 +25,18 @@ export const RETRIEVE_K = 16
 export const RERANK_K = 5
 /** Reranker scores below this are treated as noise and dropped. */
 export const MIN_RERANK_SCORE = 0.01
+/**
+ * Passages must also score at least this fraction of the best one.
+ *
+ * An absolute floor alone let clear noise through: asked about multi-agent
+ * systems, the top hit scored 0.349 and the Fawri passage 0.035 — and the
+ * model, handed a passage about a different employer, attached PalTech's
+ * multi-agent work to Fawri's e-commerce agent. Passages the generator never
+ * sees cannot be blended into the answer.
+ */
+export const RELEVANCE_RATIO = 0.25
+/** Always hand over at least this many, so an answer is never context-starved. */
+export const MIN_PASSAGES = 2
 
 export interface RagConfig {
   apiKey: string

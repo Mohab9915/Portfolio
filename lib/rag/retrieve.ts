@@ -10,7 +10,9 @@
 import cvIndex from '../../data/cv-index.json'
 
 import {
+  MIN_PASSAGES,
   MIN_RERANK_SCORE,
+  RELEVANCE_RATIO,
   RERANK_K,
   RETRIEVE_K,
   zillizConfigured,
@@ -147,14 +149,20 @@ export async function retrieve(
   }
 
   // 3. Select ------------------------------------------------------------
-  const strong = reranked
-    ? ordered.filter((p) => (p.rerankScore ?? 0) >= MIN_RERANK_SCORE)
-    : ordered
+  let strong = ordered
+  if (reranked) {
+    const top = Math.max(...ordered.map((p) => p.rerankScore ?? 0), 0)
+    const cutoff = Math.max(MIN_RERANK_SCORE, top * RELEVANCE_RATIO)
+    strong = ordered.filter((p) => (p.rerankScore ?? 0) >= cutoff)
+  }
 
   // Keep a couple of passages even when nothing scores well. The generator is
   // instructed to decline when the context does not support an answer, and it
   // does that far more gracefully with something to look at than with nothing.
-  const selected = (strong.length > 0 ? strong : ordered).slice(0, RERANK_K)
+  const selected =
+    strong.length >= MIN_PASSAGES
+      ? strong.slice(0, RERANK_K)
+      : ordered.slice(0, MIN_PASSAGES)
 
   return { passages: selected, source, reranked, notes }
 }
