@@ -67,6 +67,19 @@ export const STATES: Record<PetState, SpriteState> = {
   // looping — otherwise he stands up and collapses over and over.
   sleep: { row: 5, frames: 8, fps: 3, loop: false, hold: true },
   guitar: { row: 6, frames: 6, fps: 8, loop: true },
-  talk: { row: 7, frames: 6, fps: 8, loop: true },
-  think: { row: 8, frames: 6, fps: 6, loop: true },
+  /*
+   * The atlas has no real talking animation.
+   *
+   * Row 7 looked like one, but measuring leg movement across every frame of
+   * every row put it at 30px of swing — against 37px for walk and run, and 2px
+   * for idle. It is a second locomotion cycle, so using it for speech made him
+   * march on the spot for the whole answer.
+   *
+   * Talking therefore uses row 0, the stillest row on the sheet (2px of leg
+   * movement, just a blink). A pet standing calmly while the voice plays reads
+   * far better than one appearing to walk nowhere. Thinking keeps row 8, whose
+   * arms move while its feet stay planted, so the two states still differ.
+   */
+  talk: { row: 0, frames: 6, fps: 5, loop: true },
+  think: { row: 8, frames: 6, fps: 5, loop: true },
 }
