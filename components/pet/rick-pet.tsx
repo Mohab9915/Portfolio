@@ -17,24 +17,23 @@ export type PetActivity = 'wander' | 'think' | 'talk'
 interface Props {
   /** Driven by the chat: thinking while the model reasons, talking while it streams. */
   activity: PetActivity
-  /** True once the chat panel is open, so he stops roaming and stands by it. */
+  /** True once the chat panel is open, so he holds still. */
   anchored: boolean
-  /** Width to leave clear on the right for the chat panel. */
-  anchorInset: number
   /**
-   * Distance from the bottom of the viewport to stand at. On narrow screens
-   * the chat panel is full-width, so rather than being hidden behind it he is
-   * lifted up to stand on top of it.
+   * Called with where he is standing when clicked, so the panel can open at
+   * him. He used to walk across to a fixed panel, which read as running away
+   * mid-conversation; now the panel comes to him and he never moves for it.
    */
-  bottomOffset: number
-  onSummon: () => void
+  onSummon: (rect: DOMRect) => void
 }
 
 /** Pixels per second. */
 const SPEED = { walk: 46, run: 118 }
 /** No pointer or key input for this long and he curls up. */
 const SLEEP_AFTER_MS = 45_000
-/** Distance from the anchor within which he stops walking. */
+/** How far above the ground he stands. */
+const GROUND_OFFSET = 4
+/** Close enough to a wander target to call it arrived. */
 const ARRIVE_EPSILON = 6
 
 interface Brain {
@@ -65,13 +64,7 @@ interface Brain {
   ready: boolean
 }
 
-export function RickPet({
-  activity,
-  anchored,
-  anchorInset,
-  bottomOffset,
-  onSummon,
-}: Props) {
+export function RickPet({ activity, anchored, onSummon }: Props) {
   const rootRef = useRef<HTMLButtonElement>(null)
   const spriteRef = useRef<HTMLSpanElement>(null)
   const brainRef = useRef<Brain | null>(null)
@@ -82,8 +75,8 @@ export function RickPet({
 
   // Props are read inside the animation loop, which must not be re-created on
   // every render — a mirror ref keeps the loop stable and current.
-  const propsRef = useRef({ activity, anchored, anchorInset })
-  propsRef.current = { activity, anchored, anchorInset }
+  const propsRef = useRef({ activity, anchored })
+  propsRef.current = { activity, anchored }
 
   /* Decode the atlas before first paint so he never flashes a blank box. */
   useEffect(() => {
@@ -160,14 +153,6 @@ export function RickPet({
       window.addEventListener(evt, markInput, { passive: true })
     }
 
-    /** Where he should stand while the chat is open. */
-    const anchorX = () => {
-      const { anchorInset: inset } = propsRef.current
-      const desktop = window.innerWidth >= 640
-      if (!desktop) return Math.max(8, viewport() * 0.08)
-      return Math.max(8, viewport() - inset - size.w - 16)
-    }
-
     const setState = (next: PetState) => {
       if (brain.state === next) return
       brain.state = next
@@ -212,23 +197,10 @@ export function RickPet({
       if (brain.oneShot) {
         setState(brain.oneShot)
       } else if (act === 'think' || act === 'talk' || isAnchored) {
-        // Walk over to the panel, then settle into the chat animation — but
-        // never while speaking. Crossing the page mid-sentence reads as him
-        // walking away from his own answer, so once he starts talking he
-        // plants himself wherever he happens to be.
-        const target = anchorX()
-        const delta = target - brain.x
-        const shouldReposition =
-          act !== 'talk' && Math.abs(delta) > ARRIVE_EPSILON && !reduceMotion
-
-        if (shouldReposition) {
-          brain.dir = delta > 0 ? 1 : -1
-          brain.x += Math.sign(delta) * SPEED.walk * dt
-          setState('walk')
-        } else {
-          if (reduceMotion) brain.x = target
-          setState(act === 'think' ? 'think' : act === 'talk' ? 'talk' : 'idle')
-        }
+        // He does not travel once the chat is open — the panel opened at him,
+        // so there is nowhere to go. Walking or running mid-conversation read
+        // as him wandering off from his own answer.
+        setState(act === 'think' ? 'think' : act === 'talk' ? 'talk' : 'idle')
       } else if (asleep) {
         setState('sleep')
       } else if (reduceMotion) {
@@ -308,7 +280,9 @@ export function RickPet({
       brain.frameClock = 0
     }
     setShowHint(false)
-    onSummon()
+    // Hand the panel his current position so it can open next to him.
+    const rect = rootRef.current?.getBoundingClientRect()
+    if (rect) onSummon(rect)
   }
 
   if (!ready) return null
@@ -319,11 +293,11 @@ export function RickPet({
       type="button"
       onClick={handleClick}
       aria-label="Ask Rick about Mohab's experience"
-      className="group fixed left-0 z-40 cursor-pointer select-none border-0 bg-transparent p-0 outline-none transition-[bottom] duration-300 ease-out focus-visible:ring-2 focus-visible:ring-primary"
+      className="group fixed left-0 z-40 cursor-pointer select-none border-0 bg-transparent p-0 outline-none focus-visible:ring-2 focus-visible:ring-primary"
       style={{
         width: size.w,
         height: size.h,
-        bottom: bottomOffset,
+        bottom: GROUND_OFFSET,
         willChange: 'transform',
       }}
     >

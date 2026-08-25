@@ -1,6 +1,12 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react'
 import { Send, Volume2, VolumeX, X } from 'lucide-react'
 
 import { RickPet, type PetActivity } from './rick-pet.tsx'
@@ -10,7 +16,12 @@ import {
   type SpeechQueue,
 } from './speech-queue.ts'
 
-const PANEL_WIDTH = 380
+/** Kept clear of the viewport edges when the panel is clamped. */
+const PANEL_MARGIN = 16
+/** Vertical gap between the top of the pet and the bottom of the panel. */
+const PANEL_GAP = 12
+/** Below this much room above the pet, the panel stops trying to sit there. */
+const MIN_PANEL_HEIGHT = 220
 /** Keystrokes stop counting as "typing" this long after the last one. */
 const TYPING_IDLE_MS = 1200
 
@@ -97,7 +108,16 @@ export default function AskRick() {
   const [speaking, setSpeaking] = useState(false)
 
   const panelRef = useRef<HTMLDivElement>(null)
-  const [petBottom, setPetBottom] = useState(4)
+  /** Where the pet was standing when summoned; the panel opens there. */
+  const [anchor, setAnchor] = useState<{ centerX: number; top: number } | null>(
+    null,
+  )
+  /** Resolved panel position, measured once the panel has a width. */
+  const [placement, setPlacement] = useState<{
+    left: number
+    bottom: number
+    maxHeight: number
+  } | null>(null)
   const abortRef = useRef<AbortController | null>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
   // Read inside the streaming callback, which would otherwise close over a
@@ -199,29 +219,50 @@ export default function AskRick() {
   }, [])
 
   /**
-   * On a phone the panel is full width, so the pet's usual spot at the bottom
-   * of the viewport is underneath it. Lift him to stand on the panel's top
-   * edge instead — the panel grows as the answer streams, so track its height.
+   * Keep the panel over the pet.
+   *
+   * It is centred on him and sits just above his head, clamped to stay on
+   * screen — so on a narrow viewport it simply pins to the edge rather than
+   * hanging off it. Recomputed on resize because the clamp depends on width.
    */
-  useEffect(() => {
-    const update = () => {
-      const narrow = window.innerWidth < 640
-      const height = panelRef.current?.offsetHeight ?? 0
-      // 16px panel inset from the bottom, plus a little breathing room.
-      setPetBottom(open && narrow && height ? height + 28 : 4)
+  useLayoutEffect(() => {
+    if (!open || !anchor) {
+      setPlacement(null)
+      return
     }
-    update()
 
-    const panel = panelRef.current
-    const observer = panel ? new ResizeObserver(update) : null
-    if (panel && observer) observer.observe(panel)
-    window.addEventListener('resize', update)
+    const place = () => {
+      const panel = panelRef.current
+      if (!panel) return
+      const width = panel.offsetWidth
+      const centred = anchor.centerX - width / 2
+      // Clamp so a pet near either edge still gets a fully visible panel.
+      const left = Math.max(
+        PANEL_MARGIN,
+        Math.min(centred, window.innerWidth - width - PANEL_MARGIN),
+      )
 
-    return () => {
-      observer?.disconnect()
-      window.removeEventListener('resize', update)
+      // Only as tall as the gap between his head and the top of the screen.
+      // Without this the panel runs off the top on a short viewport.
+      const roomAbove = anchor.top - PANEL_GAP - PANEL_MARGIN
+      const fitsAbove = roomAbove >= MIN_PANEL_HEIGHT
+
+      setPlacement({
+        left,
+        // If there is genuinely no room above him, fall back to sitting on the
+        // bottom margin and using the full height — overlapping him is worse
+        // than a panel that runs off screen, but only just.
+        bottom: fitsAbove ? window.innerHeight - anchor.top + PANEL_GAP : PANEL_MARGIN,
+        maxHeight: fitsAbove
+          ? roomAbove
+          : window.innerHeight - PANEL_MARGIN * 2,
+      })
     }
-  }, [open])
+
+    place()
+    window.addEventListener('resize', place)
+    return () => window.removeEventListener('resize', place)
+  }, [open, anchor])
 
   const noteTyping = useCallback(() => {
     setPhase((p) => (p === 'thinking' || p === 'streaming' ? p : 'typing'))
@@ -395,15 +436,31 @@ export default function AskRick() {
       <RickPet
         activity={petActivity}
         anchored={open}
-        anchorInset={PANEL_WIDTH + 24}
-        bottomOffset={petBottom}
-        onSummon={() => setOpen((v) => !v)}
+        onSummon={(rect) => {
+          setAnchor({ centerX: rect.left + rect.width / 2, top: rect.top })
+          setOpen((v) => !v)
+        }}
       />
 
       {open && (
         <div
           ref={panelRef}
-          className="fixed bottom-4 right-4 z-50 flex w-[min(400px,calc(100vw-2rem))] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-2xl backdrop-blur-md"
+          className="fixed z-50 flex w-[min(400px,calc(100vw-2rem))] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-2xl backdrop-blur-md"
+          /*
+           * Position comes from state, not from writing to panel.style — this
+           * component re-renders on every streamed chunk, and React would
+           * overwrite imperative style writes on each one. Off-screen until
+           * measured, so it never flashes in the wrong place.
+           */
+          style={
+            placement
+              ? {
+                  left: placement.left,
+                  bottom: placement.bottom,
+                  maxHeight: placement.maxHeight,
+                }
+              : { left: -9999, bottom: PANEL_MARGIN, visibility: 'hidden' }
+          }
           role="dialog"
           aria-label="Ask about Mohab"
         >
@@ -449,7 +506,7 @@ export default function AskRick() {
           {/* Transcript */}
           <div
             ref={scrollRef}
-            className="flex max-h-[56vh] min-h-[150px] flex-col gap-4 overflow-y-auto px-4 py-4 text-sm leading-relaxed"
+            className="flex min-h-[110px] flex-1 flex-col gap-4 overflow-y-auto px-4 py-4 text-sm leading-relaxed"
           >
             {messages.length === 0 && (
               <div className="flex flex-col gap-4">
